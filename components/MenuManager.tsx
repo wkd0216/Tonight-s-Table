@@ -7,6 +7,8 @@ interface MenuManagerProps {
   menus: MenuItem[];
   onToggle: (id: string) => void;
   onAdd: (name: string) => void;
+  onDelete: (id: string) => void;
+  onReset: () => void;
   onEditCategory: (oldCategory: string, newCategory: string) => void;
 }
 
@@ -14,6 +16,8 @@ export const MenuManager: React.FC<MenuManagerProps> = ({
   menus, 
   onToggle, 
   onAdd,
+  onDelete,
+  onReset,
   onEditCategory
 }) => {
   const [newMenu, setNewMenu] = useState('');
@@ -83,6 +87,7 @@ export const MenuManager: React.FC<MenuManagerProps> = ({
           className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent"
         />
         <Button type="submit" variant="primary">추가</Button>
+        <Button type="button" onClick={onReset} variant="secondary">초기화</Button>
       </form>
 
       <div className="space-y-8 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
@@ -138,7 +143,7 @@ export const MenuManager: React.FC<MenuManagerProps> = ({
                 {groupedMenus[category].map((menu) => (
                   <div 
                     key={menu.id} 
-                    className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+                    className={`group flex items-center justify-between p-3 rounded-xl border transition-all ${
                       menu.isEnabled ? 'bg-white border-gray-100 hover:border-orange-100' : 'bg-gray-50 border-transparent opacity-60'
                     }`}
                   >
@@ -153,6 +158,14 @@ export const MenuManager: React.FC<MenuManagerProps> = ({
                         {menu.name}
                       </span>
                     </div>
+                    <button
+                      onClick={() => onDelete(menu.id)}
+                      className="w-7 h-7 flex-shrink-0 rounded-full bg-gray-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100 hover:text-red-500"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 transition-colors group-hover:text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clipRule="evenodd" />
+                      </svg>
+                    </button>
                   </div>
                 ))}
               </div>

@@ -45,6 +45,16 @@ const App: React.FC = () => {
     };
     setMenus(prev => [newMenu, ...prev]);
   };
+  
+  const handleDelete = (id: string) => {
+    setMenus(prev => prev.filter(m => m.id !== id));
+  };
+
+  const handleReset = () => {
+    if (window.confirm('정말로 모든 메뉴를 초기 상태로 되돌리시겠어요? 추가하거나 변경한 내용은 모두 사라집니다.')) {
+      setMenus(INITIAL_MENUS.map(m => ({ ...m })));
+    }
+  };
 
   const handleEditCategory = (oldCategory: string, newCategory: string) => {
     setMenus(prev => prev.map(m => 
@@ -212,6 +222,8 @@ const App: React.FC = () => {
               menus={menus} 
               onToggle={handleToggle} 
               onAdd={handleAdd} 
+              onDelete={handleDelete}
+              onReset={handleReset}
               onEditCategory={handleEditCategory}
             />
           </div>
