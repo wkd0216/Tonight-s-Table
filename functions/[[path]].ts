@@ -1,7 +1,7 @@
 
 import { Hono } from 'hono';
 import { handle } from 'hono/vercel';
-import { GoogleGenerativeAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/genai/node';
 
 // Initialize Hono app
 const app = new Hono().basePath('/api');
