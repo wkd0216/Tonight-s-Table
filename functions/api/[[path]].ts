@@ -2,15 +2,16 @@
 import { Hono } from 'hono';
 import { handle } from 'hono/cloudflare-pages';
 
-// Hono 앱 초기화
-const app = new Hono().basePath('/api');
+// Hono 앱 초기화. basePath를 제거합니다.
+const app = new Hono();
 
-// 환경 변수 타입 정의 (타입스크립트 안정성)
+// 환경 변수 타입 정의
 type Bindings = {
   GEMINI_API_KEY: string;
 }
 
-// POST /api/recommend
+// 이제 이 파일은 /api/ 경로 아래의 모든 요청을 처리합니다.
+// /api/recommend 에 대한 POST 요청을 처리하도록 라우트를 수정합니다.
 app.post('/recommend', async (c) => {
   // Cloudflare 환경에 맞는 방식으로 환경 변수 가져오기
   const GEMINI_API_KEY = (c.env as Bindings).GEMINI_API_KEY;
@@ -60,7 +61,6 @@ app.post('/recommend', async (c) => {
 
     const responseData = await geminiResponse.json();
     
-    // Gemini API 응답을 안전하게 파싱
     const candidate = responseData?.candidates?.[0];
     const text = candidate?.content?.parts?.[0]?.text;
 
@@ -76,6 +76,10 @@ app.post('/recommend', async (c) => {
     return c.json({ error: 'Failed to generate recommendation' }, 500);
   }
 });
+
+// 모든 다른 /api/ 경로에 대한 기본 핸들러 (선택 사항)
+app.all('*', () => new Response('API endpoint not found', { status: 404 }));
+
 
 // Cloudflare Pages 함수로 내보내기
 export const onRequest = handle(app);
