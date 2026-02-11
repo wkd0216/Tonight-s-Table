@@ -1,19 +1,20 @@
 
 import { Hono } from 'hono';
 import { handle } from 'hono/vercel';
-import { GoogleGenerativeAI } from '@google/genai/node';
 
 // Initialize Hono app
 const app = new Hono().basePath('/api');
 
-// Gemini API-Key
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 // POST /api/recommend
 app.post('/recommend', async (c) => {
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+  if (!GEMINI_API_KEY) {
+    return c.json({ error: 'GEMINI_API_KEY environment variable not set' }, 500);
+  }
+
   const { occasion, tastes, budget, otherRequests } = await c.req.json();
 
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
   const prompt = `
     You are a helpful assistant that recommends personalized dinner menus.
 
@@ -28,11 +29,34 @@ app.post('/recommend', async (c) => {
     Please answer in Korean.
   `;
 
+  const requestBody = {
+    contents: [{
+      parts: [{
+        text: prompt,
+      }],
+    }],
+  };
+
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = await response.text();
+    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!geminiResponse.ok) {
+      const errorBody = await geminiResponse.text();
+      console.error('Gemini API error:', errorBody);
+      return c.json({ error: `Gemini API request failed with status ${geminiResponse.status}` }, 500);
+    }
+
+    const responseData = await geminiResponse.json();
+    const text = responseData.candidates[0].content.parts[0].text;
+    
     return c.json({ recommendation: text });
+
   } catch (error) {
     console.error(error);
     return c.json({ error: 'Failed to generate recommendation' }, 500);
