@@ -1,16 +1,22 @@
 
 import { Hono } from 'hono';
-import { handle } from 'hono/vercel';
+import { handle } from 'hono/cloudflare-pages';
 
-// Initialize Hono app
+// Hono 앱 초기화
 const app = new Hono().basePath('/api');
+
+// 환경 변수 타입 정의 (타입스크립트 안정성)
+type Bindings = {
+  GEMINI_API_KEY: string;
+}
 
 // POST /api/recommend
 app.post('/recommend', async (c) => {
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  // Cloudflare 환경에 맞는 방식으로 환경 변수 가져오기
+  const GEMINI_API_KEY = (c.env as Bindings).GEMINI_API_KEY;
 
   if (!GEMINI_API_KEY) {
-    return c.json({ error: 'GEMINI_API_KEY environment variable not set' }, 500);
+    return c.json({ error: 'GEMINI_API_KEY environment variable not set in Cloudflare dashboard' }, 500);
   }
 
   const { occasion, tastes, budget, otherRequests } = await c.req.json();
@@ -53,7 +59,15 @@ app.post('/recommend', async (c) => {
     }
 
     const responseData = await geminiResponse.json();
-    const text = responseData.candidates[0].content.parts[0].text;
+    
+    // Gemini API 응답을 안전하게 파싱
+    const candidate = responseData?.candidates?.[0];
+    const text = candidate?.content?.parts?.[0]?.text;
+
+    if (!text) {
+        console.error('Invalid Gemini response structure:', responseData);
+        return c.json({ error: 'Failed to parse recommendation from Gemini API response.' }, 500);
+    }
     
     return c.json({ recommendation: text });
 
@@ -63,4 +77,5 @@ app.post('/recommend', async (c) => {
   }
 });
 
+// Cloudflare Pages 함수로 내보내기
 export const onRequest = handle(app);
