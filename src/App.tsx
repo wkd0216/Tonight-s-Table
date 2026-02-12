@@ -112,7 +112,7 @@ const App: React.FC = () => {
           onClick={() => setView('recommend')} 
           className="text-2xl font-bold text-orange-600 flex items-center gap-2 hover:scale-105 transition-transform"
         >
-          <span className="drop-shadow-sm">🍲</span> 오늘의 식탁
+          <span role="img" aria-label="요리 냄비 아이콘" className="drop-shadow-sm">🍲</span> 오늘의 식탁
         </button>
         <nav className="flex gap-1 sm:gap-2">
           <Button 
@@ -174,14 +174,14 @@ const App: React.FC = () => {
                         <div className="md:w-2/3 flex flex-col gap-4">
                           <div className="p-4 bg-orange-50/50 rounded-2xl border border-orange-100">
                             <h4 className="font-bold text-orange-700 mb-1 flex items-center gap-2 text-sm">
-                              <span className="text-base">💡</span> 추천 이유
+                              <span role="img" aria-label="전구 아이콘" className="text-base">💡</span> 추천 이유
                             </h4>
                             <p className="text-gray-700 leading-relaxed break-keep text-[15px]">{item.reason}</p>
                           </div>
                           
                           <div className="p-4 bg-green-50/50 rounded-2xl border border-green-100">
                             <h4 className="font-bold text-green-700 mb-1 flex items-center gap-2 text-sm">
-                              <span className="text-base">✨</span> 더 맛있게 먹는 팁
+                              <span role="img" aria-label="반짝이는 별 아이콘" className="text-base">✨</span> 더 맛있게 먹는 팁
                             </h4>
                             <p className="text-gray-700 leading-relaxed break-keep text-[15px]">{item.tip}</p>
                           </div>
@@ -199,7 +199,7 @@ const App: React.FC = () => {
               ) : (
                 <div className="w-full bg-white p-12 sm:p-20 rounded-[2.5rem] shadow-2xl shadow-orange-100 border border-gray-100 flex flex-col items-center">
                   <div className="w-40 h-40 bg-orange-50 rounded-full flex items-center justify-center text-7xl mb-10 shadow-inner group-hover:scale-110 transition-transform cursor-pointer" onClick={handleRecommend}>
-                    <span className="animate-bounce">🍱</span>
+                    <span role="img" aria-label="도시락 아이콘" className="animate-bounce">🍱</span>
                   </div>
                   <Button variant="primary" onClick={handleRecommend} className="px-16 py-5 text-2xl shadow-xl shadow-orange-200 rounded-2xl font-black">
                     추천 시작!
